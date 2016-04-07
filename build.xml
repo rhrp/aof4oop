@@ -1,0 +1,366 @@
+<?xml version="1.0"?>
+
+<project name="AOF4OOP" default="srec" basedir=".">
+
+  <property name="base.dir"        value="."/>
+  <property name="src.dir"         value="${base.dir}/src"/>
+  <property name="lib.dir"         value="${base.dir}/lib"/>
+  <property name="dweaver.dir"     value="${base.dir}/dweaver"/>
+  <!--
+  <property name="aspectj.lib.dir" value="${base.dir}/lib.aspectj-1.6.10"/>
+  -->
+  <property name="aspectj.lib.dir" value="${base.dir}/lib.aspectj-1.7.4"/>
+  <property name="dist.dir"   	   value="${base.dir}/dist"/>
+  <property name="classes.dir"     value="${dist.dir}/classes"/>
+  <property name="examples.dir"    value="${base.dir}/examples"/>
+  <property name="sweaver.tmp.dir" value="${dist.dir}/src_sweaver"/>
+  <property name="classes.dir.oo7db4o" value="${dist.dir}/classes.oo7db4o"/>  
+
+
+  <!-- required libraries - install or predefine -->
+  <property name="antlr-complete.jar" location="${lib.dir}/antlr-3.3-complete.jar"/>
+  <property name="preproc.jar"        location="${lib.dir}/preproc.jar"/>
+  <property name="db4obj.jar"         location="${lib.dir}/db4o-7.12.156.14667-all-java5.jar"/>
+  <property name="javaassist.jar"     location="${lib.dir}/javassist-3.15.0.GA.jar"/>
+  <property name="jmapviewer.jar"     location="${lib.dir}/JMapViewer_29618.jar"/>
+
+  <path id="classpath.preproc">
+     <path location="${antlr-complete.jar}"/>
+     <path location="${preproc.jar}"/>
+  </path>
+
+  <path id="classpath.oo7db4o">
+     <path location="${db4obj.jar}"/>
+     <path location="${javaassist.jar}"/>
+  </path>
+
+  <target name="clean">
+    <delete dir="${dist.dir}"/>
+  </target>
+
+  <!--
+  Clean database and all related temporary classes
+  -->
+  <target name="clean.db">
+    <delete file="aof4oop.dbf"/>
+    <delete dir="${dweaver.dir}/classpath"/>
+    <mkdir dir="${dweaver.dir}/classpath"/>
+    <delete dir="${dweaver.dir}/out"/>
+    <mkdir dir="${dweaver.dir}/out"/>
+    <!--
+     Avoid conflits with Eclipse bins
+    -->
+    <delete dir="eclise/bin"/>
+  </target>
+
+
+  <target name="clean.aspectj">
+    
+  </target>
+
+
+  <target name="prepare">
+    <mkdir dir="${dist.dir}"/>
+    <mkdir dir="${classes.dir}"/>
+    <mkdir dir="${sweaver.tmp.dir}"/>
+  </target>
+
+  <target name="sweaver" depends="prepare">
+    <taskdef name="weaver" classname="rhp.aof4oop.framework.preproc.AntTask" classpath="${preproc.jar}:${antlr-complete.jar}"/>
+    <weaver sourceDir="${examples.dir}/preproc/src" outputDir="${sweaver.tmp.dir}"/>
+  </target>
+
+   <!--
+    AspectJ
+    -->
+   <!-- checking required libraries -->
+    <target name="init.variables" description="init variables">
+     
+      <!-- build.compiler value to pick up our CompilerAdapter for javac -->
+      <property name="ajc.adapter" value="org.aspectj.tools.ant.taskdefs.Ajc11CompilerAdapter"/>
+
+      <!-- required libraries - install or predefine -->
+      <property name="aspectjrt.jar"     location="${aspectj.lib.dir}/aspectjrt.jar"/> 
+      <property name="aspectjtools.jar"  location="${aspectj.lib.dir}/aspectjtools.jar"/> 
+      <property name="aspectjweaver.jar" location="${aspectj.lib.dir}/aspectjweaver.jar"/>
+
+
+      <!-- checking required libraries -->
+      <available file="${aspectjtools.jar}" property="aspectjtools.jar.available"/>
+      <available file="${aspectjrt.jar}"    property="aspectjrt.jar.available"/>
+    </target>
+
+    <!-- targets to fail unless required libraries available -->
+    <target name="aspectjrt.jar.available" 
+            depends="init.variables" 
+            unless="aspectjrt.jar.available" >
+      <fail message="expecting aspectjrt.jar at ${aspectjrt.jar}"/>
+    </target>
+    <target name="aspectjtools.jar.available"
+	    depends="init.variables" 
+            unless="aspectjtools.jar.available" >
+      <fail message="expecting aspectjtools.jar at ${aspectjtools.jar}"/>
+    </target>
+
+
+    <!-- init ajc/iajc -->
+    <target name="init.taskdefs" depends="init.variables,aspectjtools.jar.available,aspectjrt.jar.available" unless="taskdefs.init">
+      <!-- sets name of new task to iajc, old task to ajc -->
+      <taskdef resource="org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties">
+          <classpath> 
+            <pathelement path="${aspectjtools.jar}"/> 
+          </classpath>
+      </taskdef>
+      <property name="taskdefs.init" value="true"/>
+    </target>
+
+    <!-- ============================================================= -->
+    <!-- these targets compile and run any example                     -->
+    <!-- ============================================================= -->
+<!--
+             fork="true"
+             forkclasspath="${aspectjtools.jar}"
+-->
+    <target name="Ajx-compile" depends="sweaver,init.variables,init.taskdefs"
+            description="compile {list}">
+       <echo message="Ajx-compile list=${list}" />
+       <antcall target="clean.aspectj" />
+       <!-- can use ajc or iajc here xxx
+             source="-1.7"  aparentemente esta a ignorar
+             target="-1.7"
+       -->
+       <iajc srcdir="src"
+             source="7"
+             target="7"
+             destdir="${classes.dir}" argfiles="${list}"
+             fork="true"
+             forkclasspath="${aspectjtools.jar}"
+             classpath="${aspectjrt.jar}:${javaassist.jar}:${lib.dir}/db4o-7.12.156.14667-all-java5.jar"/>
+    </target>
+
+    <target name="jversion">
+         <echo>${ant.version}</echo>
+         <echo>${java.version}</echo>
+    </target>
+
+    <target name="Ajx-run" depends="init.variables" 
+          description="run {class} unless {norun} is set" 
+          unless="norun" >
+       <echo message="Ajx-run class=${class} aspectjrt=${aspectjrt.jar}"/>
+       <java classname="${class}" fork="yes">
+          <jvmarg value="-Djava.system.class.loader=rhp.aof4oop.framework.core.CClassLoader"/>
+          <arg value="${arg1}"/>
+          <arg value="${arg2}"/>
+          <arg value="${arg3}"/>
+          <classpath>
+           <pathelement path="${classes.dir}"/>
+           <pathelement path="${aspectjrt.jar}"/>
+           <pathelement path="${lib.dir}/db4o-7.12.156.14667-all-java5.jar"/>
+           <pathelement path="${javaassist.jar}"/>
+          </classpath>
+       </java>
+    </target>
+
+    <target name="Demo01"  description="Build and run Demo01 example">
+      <antcall target="Ajx-compile">
+        <param name="list"    value="files.lst"/>
+      </antcall>
+       <antcall target="Ajx-run" >
+         <param name="class"   value="rhp.aof4oop.apps.Demo01"/>
+       </antcall>
+    </target>
+    <target name="Demo04"  description="Build and run Demo04 example">
+      <antcall target="Ajx-compile">
+        <param name="list"    value="files.lst"/>
+      </antcall>
+       <antcall target="Ajx-run" >
+         <param name="class" value="pack1.Demo04"/>
+       </antcall>
+    </target>
+  <target name="oo7"  description="Build and run OO7 benchmark - Full test">
+      <antcall target="oo7_createdb"/>
+      <antcall target="oo7_travS1"/>
+      <antcall target="oo7_travS2"/>
+      <antcall target="oo7_travS3"/>
+      <antcall target="oo7_travS4"/>
+      <antcall target="oo7_travS1"/>
+      <antcall target="oo7_travS1"/>
+      <antcall target="oo7_travS1"/>
+  </target>
+  <target name="oo7_createdb"  description="Build and run OO7 benchmark - CreateDB">
+      <antcall target="clean.db"/>
+      <antcall target="clean"/>
+      <echo message="Set Schema as Version S1" /> 
+      <copy file="${base.dir}/datamodel_oo7/AtomicPart_S1.java" tofile="${src.dir}/rhp/aof4oop/oo7/datamodel/AtomicPart.java" overwrite="true"/>
+      <copy file="${base.dir}/datamodel_oo7/BaseAssembly_S1.java" tofile="${src.dir}/rhp/aof4oop/oo7/datamodel/BaseAssembly.java" overwrite="true"/>
+      <copy file="${base.dir}/datamodel_oo7/ComplexAssembly_S1.java" tofile="${src.dir}/rhp/aof4oop/oo7/datamodel/ComplexAssembly.java" overwrite="true"/>
+      <antcall target="Ajx-compile">
+        <param name="list"    value="files.lst"/>
+      </antcall>
+
+      <antcall target="Ajx-run" >
+        <param name="class"   value="rhp.aof4oop.oo7.benchmarck.AOF4OOP"/>
+        <param name="arg1"   value="S1"/>
+        <param name="arg2"   value="CreateDB"/>
+        <param name="arg3"   value="none"/>
+      </antcall>
+  </target>
+
+  <target name="oo7_travS1"  description="Build and run OO7 benchmark - Trav - S1">
+      <antcall target="clean"/>
+      <echo message="Set Schema as Version S1" />
+      <copy file="${base.dir}/datamodel_oo7/AtomicPart_S1.java" tofile="${src.dir}/rhp/aof4oop/oo7/datamodel/AtomicPart.java" overwrite="true"/>
+      <copy file="${base.dir}/datamodel_oo7/BaseAssembly_S1.java" tofile="${src.dir}/rhp/aof4oop/oo7/datamodel/BaseAssembly.java" overwrite="true"/>
+      <copy file="${base.dir}/datamodel_oo7/ComplexAssembly_S1.java" tofile="${src.dir}/rhp/aof4oop/oo7/datamodel/ComplexAssembly.java" overwrite="true"/>
+      <antcall target="Ajx-compile">
+        <param name="list"    value="files.lst"/>
+      </antcall>
+
+      <antcall target="Ajx-run" >
+         <param name="class"   value="rhp.aof4oop.oo7.benchmarck.AOF4OOP"/>
+         <param name="arg1"   value="S1"/>
+         <param name="arg2"   value="Trav"/>
+         <param name="arg3"   value="1"/>
+       </antcall>
+
+      <antcall target="Ajx-run" >
+         <param name="class"   value="rhp.aof4oop.oo7.benchmarck.AOF4OOP"/>
+         <param name="arg1"   value="S1"/>
+         <param name="arg2"   value="Trav"/>
+         <param name="arg3"   value="2"/>
+       </antcall>
+  </target>
+
+  <target name="oo7_travS2"  description="Build and run OO7 benchmark - Trav - S2">
+       <antcall target="clean"/>
+       <echo message="Set Schema as Version S2" />
+       <copy file="${base.dir}/datamodel_oo7/AtomicPart_S2.java" tofile="${src.dir}/rhp/aof4oop/oo7/datamodel/AtomicPart.java" overwrite="true"/>
+       <copy file="${base.dir}/datamodel_oo7/BaseAssembly_S1.java" tofile="${src.dir}/rhp/aof4oop/oo7/datamodel/BaseAssembly.java" overwrite="true"/>
+       <copy file="${base.dir}/datamodel_oo7/ComplexAssembly_S1.java" tofile="${src.dir}/rhp/aof4oop/oo7/datamodel/ComplexAssembly.java" overwrite="true"/>
+       <antcall target="Ajx-compile">
+        <param name="list"    value="files.lst"/>
+       </antcall>
+
+       <antcall target="Ajx-run" >
+         <param name="class"   value="rhp.aof4oop.oo7.benchmarck.AOF4OOP"/>
+         <param name="arg1"   value="S2"/>
+         <param name="arg2"   value="Trav"/>
+         <param name="arg3"   value="1"/>
+       </antcall>
+
+       <antcall target="Ajx-run" >
+         <param name="class"   value="rhp.aof4oop.oo7.benchmarck.AOF4OOP"/>
+         <param name="arg1"   value="S2"/>
+         <param name="arg2"   value="Trav"/>
+         <param name="arg3"   value="2"/>
+       </antcall>
+  </target>
+
+  <target name="oo7_travS3"  description="Build and run OO7 benchmark - Trav - S3">
+       <antcall target="clean"/>
+       <echo message="Set Schema as Version S3" />
+       <copy file="${base.dir}/datamodel_oo7/AtomicPart_S2.java" tofile="${src.dir}/rhp/aof4oop/oo7/datamodel/AtomicPart.java" overwrite="true"/>
+       <copy file="${base.dir}/datamodel_oo7/BaseAssembly_S3.java" tofile="${src.dir}/rhp/aof4oop/oo7/datamodel/BaseAssembly.java" overwrite="true"/>
+       <copy file="${base.dir}/datamodel_oo7/ComplexAssembly_S3.java" tofile="${src.dir}/rhp/aof4oop/oo7/datamodel/ComplexAssembly.java" overwrite="true"/>
+       <antcall target="Ajx-compile">
+        <param name="list"    value="files.lst"/>
+       </antcall>
+
+      <antcall target="Ajx-run" >
+         <param name="class"   value="rhp.aof4oop.oo7.benchmarck.AOF4OOP"/>
+         <param name="arg1"   value="S3"/>
+         <param name="arg2"   value="Trav"/>
+         <param name="arg3"   value="1"/>
+       </antcall>
+
+      <antcall target="Ajx-run" >
+         <param name="class"   value="rhp.aof4oop.oo7.benchmarck.AOF4OOP"/>
+         <param name="arg1"   value="S3"/>
+         <param name="arg2"   value="Trav"/>
+         <param name="arg3"   value="2"/>
+       </antcall>
+  </target>
+
+  <target name="oo7_travS4"  description="Build and run OO7 benchmark - Trav - S4">
+       <antcall target="clean"/>
+       <echo message="Set Schema as Version S4" />
+       <copy file="${base.dir}/datamodel_oo7/AtomicPart_S4.java" tofile="${src.dir}/rhp/aof4oop/oo7/datamodel/AtomicPart.java" overwrite="true"/>
+       <copy file="${base.dir}/datamodel_oo7/BaseAssembly_S3.java" tofile="${src.dir}/rhp/aof4oop/oo7/datamodel/BaseAssembly.java" overwrite="true"/>
+       <copy file="${base.dir}/datamodel_oo7/ComplexAssembly_S3.java" tofile="${src.dir}/rhp/aof4oop/oo7/datamodel/ComplexAssembly.java" overwrite="true"/>
+       <antcall target="Ajx-compile">
+        <param name="list"    value="files.lst"/>
+       </antcall>
+
+       <antcall target="Ajx-run" >
+         <param name="class"   value="rhp.aof4oop.oo7.benchmarck.AOF4OOP"/>
+         <param name="arg1"   value="S4"/>
+         <param name="arg2"   value="Trav"/>
+         <param name="arg3"   value="1"/>
+       </antcall>
+
+      <antcall target="Ajx-run" >
+         <param name="class"   value="rhp.aof4oop.oo7.benchmarck.AOF4OOP"/>
+         <param name="arg1"   value="S4"/>
+         <param name="arg2"   value="Trav"/>
+         <param name="arg3"   value="2"/>
+       </antcall>
+  </target>
+ 
+  <target name="csapp"  description="Build and run case study application">
+      <antcall target="Ajx-compile">
+        <param name="list"    value="files.lst"/>
+      </antcall>
+       <antcall target="Ajx-run" >
+         <param name="class"   value="rhp.aof4oop.cs.apps.DemoSequencial"/>
+       </antcall>
+    </target>
+
+   <target name="jmap"  description="Build and run JMap application">
+      <antcall target="Ajx-compile">
+        <param name="list"    value="files.lst"/>
+      </antcall>
+       <antcall target="Ajx-run" >
+         <param name="class"   value="rhp.aof4oop.apps.openstreetmap.DemoJMapViewer"/>
+       </antcall>
+    </target>
+
+  <target name="srec"  description="Build and run Application for Academic Record">
+      <antcall target="Ajx-compile">
+        <param name="list"    value="files.lst"/>
+      </antcall>
+       <antcall target="Ajx-run" >
+         <param name="class"   value="rhp.aof4oop.cs.apps.AppDemo"/>
+       </antcall>
+    </target>
+
+
+
+    <target name="compile.oo7db4o" depends="">
+      <delete dir="${classes.dir.oo7db4o}"/>
+      <mkdir dir="${classes.dir.oo7db4o}"/>
+      <javac srcdir="src"
+         destdir="${classes.dir.oo7db4o}"
+         debug="on"
+         deprecation="on"
+         optimize="off"
+         includes="**" encoding="iso-8859-1">
+         <classpath refid="classpath.oo7db4o"/>
+      </javac>
+    </target>
+
+    <target name="oo7db4o" depends="compile.oo7db4o"  description="Build and run oo7 DB4o benchmark">
+      <java classname="rhp.aof4oop.oo7.benchmarck.DB4O">
+
+         <classpath refid="classpath.oo7db4o"/>
+         <classpath location="${classes.dir.oo7db4o}"/>
+<!--
+        <classpath>
+          <pathelement location="${classes.dir.oo7db4o}/"/>
+          <pathelement path="${db4obj.jar}"/>
+        </classpath>
+-->
+      </java>
+    </target>
+
+</project>
+

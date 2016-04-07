@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE AOF4OOP [
+  <!ATTLIST AOF4OOP version CDATA #REQUIRED>						<!-- version of UBMO database -->
+  <!ELEMENT AOF4OOP (ubmo+)>								<!-- many ubmo elements are allowed -->
+  <!ATTLIST ubmo name CDATA #REQUIRED>						<!-- unique token name used in ubmo -->
+  <!ATTLIST ubmo matchOldClassVersion CDATA #IMPLIED>		<!-- optional token for matching Old Class Version of the target object -->
+  <!ATTLIST ubmo matchCurrentClassVersion CDATA #IMPLIED>	<!-- optional token for matching target's current Class Version -->
+  <!ATTLIST ubmo matchClassName CDATA #IMPLIED>				<!-- optional token for matching target's Class Name -->
+  <!ATTLIST ubmo matchSuperClassName CDATA #IMPLIED>		<!-- optional token for matching target's Super Class Name -->
+  <!ATTLIST ubmo matchParentMember CDATA #IMPLIED>			<!-- optional token for matching target's parent member name -->
+  <!ATTLIST ubmo matchParentClassName CDATA #IMPLIED>		<!-- optional token for matching target's parent class name -->
+  <!ATTLIST ubmo matchParentClassVersion CDATA #IMPLIED>	<!-- optional token for matching target's parent class version -->
+  <!ATTLIST ubmo matchOldParentClassVersion CDATA #IMPLIED>	<!-- optional token for matching old parent class name of the target object -->
+  
+  <!ELEMENT ubmo  (conversion)>								
+
+  <!ELEMENT conversion (sourceCode)>
+  <!ELEMENT sourceCode (#PCDATA)>							<!-- plain source code in a programming language -->
+  <!ATTLIST conversion outputClassName CDATA #REQUIRED>		<!-- conversion function's output class name -->
+  <!ATTLIST conversion applyDefault (true|false) "true">	<!-- Should apply default conversion -->
+  <!ATTLIST conversion loadingDepth (1|2|3|4) "1">			<!-- Depth of loading when activating target object from DB-->
+  <!ATTLIST conversion loadingExcludeMembers CDATA #IMPLIED><!-- Members to be excludes for loading-->
+]>
+<AOF4OOP version="1.0">
+   <ubmo name="ConvTutor$A_to_V"
+         matchOldClassVersion="A" 
+	 	 matchCurrentClassVersion="V" 
+         matchClassName="rhp.aof4oop.cs.datamodel.Tutor">
+	 <conversion applyDefault="false" outputClassName="rhp.aof4oop.cs.datamodel.Tutor">
+	    <sourceCode>
+	    <![CDATA[
+	    only testing 1 &
+	    ]]>
+		</sourceCode>
+	 </conversion>
+   </ubmo>
+   <!--
+   Converts all Staff subclasses from A to B version 
+    -->
+   <ubmo name="ConvStaff$A_to_StaffB"
+         matchSuperClassName="rhp.aof4oop.cs.datamodel.Staff" 
+	 	 matchOldClassVersion="A" 
+	 	 matchCurrentClassVersion="B"> 
+	 	 <!-- is not required
+         matchClassName="rhp.aof4oop.cs.datamodel.*">
+         -->
+	 <conversion applyDefault="true" outputClassName="rhp.aof4oop.cs.datamodel.Staff">
+	 <sourceCode>
+	 <![CDATA[
+	    System.err.println(">>>> Person A -> Staff B!");
+	    if(oldObj!=null)
+		{
+		   System.err.println(">>>> old object:"+oldObj.getClass().getCanonicalName());
+		   System.err.println(">>>> old object Surname:"+oldObj.getSurname());
+		   System.err.println(">>>> new object:"+newObj.getClass().getCanonicalName());
+		   
+		   int p=oldObj.getSurname().indexOf(' ');
+		   if(p>0)
+		   {
+		   	 newObj.setLastName(oldObj.getSurname().substring(p));
+		   	 newObj.setMiddleName(oldObj.getSurname().substring(0,p));
+		   }
+		   else
+		   {
+		   	 newObj.setLastName(oldObj.getSurname());
+		   	 newObj.setMiddleName("");
+		   }
+		   newObj.setAddress(newObj.getAddress()+" (Version A)");
+		}
+        return newObj;
+      ]]>
+      </sourceCode>
+	  </conversion>
+   </ubmo>
+    <!-- 
+    In Principal version C there is a new member email
+  	email only exists on Principal at version C
+  	 Converts Principal from A to C version
+    -->
+   <ubmo matchOldClassVersion="A" 
+	 	 matchCurrentClassVersion="C" 
+         matchClassName="rhp.aof4oop.cs.datamodel.Principal"
+         name="ConvPrincipal$A_to_PrincipalC">
+	 <conversion applyDefault="true" outputClassName="rhp.aof4oop.cs.datamodel.Principal">
+	   <sourceCode>
+	    System.err.println(">>>> Principal A -> C!");
+	    if(newObj==null)
+	    {
+	       newObj=new rhp.aof4oop.cs.datamodel.Principal();
+	       System.err.println("Opps the new Object is null!!!");
+	    }
+	    if(oldObj==null)
+	    {
+  	       System.err.println(">>>> old object is null!!");
+	       newObj.setFirstName("Rui");
+		   newObj.setLastName("Pereira");
+		   newObj.setMiddleName("H.R.");
+		   newObj.setEmail(newObj.getFirstName()+"@organization.pt");
+		}
+		else
+		{
+		   newObj.setLastName(oldObj.getSurname());
+		   newObj.setMiddleName(oldObj.getSurname().substring(0,1)+"  "+oldObj.getFirstName().substring(0,1));
+		   newObj.setEmail(newObj.getFirstName()+"@organization.pt");
+		}
+        return newObj;
+        </sourceCode>
+	  </conversion>
+   </ubmo>
+   <!-- 
+    In Principal version C there is a new member email
+  	email only exists on Principal at version C
+  	 Converts Principal from B to C version
+    -->
+   <ubmo matchOldClassVersion="B" 
+	 	 matchCurrentClassVersion="C" 
+         matchClassName="rhp.aof4oop.cs.datamodel.Principal"
+         name="ConvPrincipal$B_to_PrincipalC">
+	 <conversion applyDefault="true" outputClassName="rhp.aof4oop.cs.datamodel.Principal">
+	    <sourceCode>
+	 System.err.println(">>>> Principal B -> C!");
+	 
+	 	if(newObj==null)
+	    {
+	       newObj=new rhp.aof4oop.cs.datamodel.Principal();
+	       System.err.println("Opps the new Object is null!!!");
+	    } 
+	    if(oldObj==null)
+	    {
+		   newObj.setEmail(newObj.getFirstName()+"@organization.pt");
+		}
+		else
+		{
+		   newObj.setEmail(newObj.getFirstName()+"@organization.pt");
+		}
+        return newObj;
+        </sourceCode>
+	  </conversion>
+   </ubmo>
+
+   <ubmo matchOldClassVersion="A" 
+	 	 matchCurrentClassVersion="B" 
+         matchClassName="rhp.osm.datamodel.xml.Way"
+         matchParentMember="ways"
+         matchParentClassName="rhp.aof4oop.apps.openstreetmap.Area"
+         name="ConvWay$Old_to_New">
+	 <conversion applyDefault="true" outputClassName="rhp.osm.datamodel.xml.Way">
+	    <sourceCode>
+	    	System.err.println(">>>> Way "+oldObj.getClass().getCanonicalName()+" -> new!");
+	    	System.err.println(">>>> array="+oldObj.getClass().isArray());
+	    	if(parentNewObj!=null)
+	    	{
+	       		System.err.println(">>>> Way parent "+parentNewObj.getClass().getCanonicalName());
+	       		System.err.println(">>>> Total "+parentNewObj.getName()+" nodes:"+parentNewObj.getNodes().length);
+	    	}
+        	return newObj;
+         </sourceCode>
+	  </conversion>
+   </ubmo>
+   
+   <!--
+   Node A to B
+   -->
+   <ubmo matchOldClassVersion="A" 
+	 	 matchCurrentClassVersion="B" 
+         matchClassName="rhp.osm.datamodel.xml.Node"
+         matchParentMember="nodes"
+         matchParentClassName="rhp.aof4oop.apps.openstreetmap.Area"
+         matchParentClassVersion="A"
+         matchOldParentClassVersion="A"
+         name="ConvNode$A_to_B">
+	 <conversion applyDefault="true" outputClassName="rhp.osm.datamodel.xml.Node">
+	    <sourceCode>
+	    	System.err.println(">>>> Node "+oldObj.getClass().getCanonicalName()+" -> new!");
+	    	System.err.println(">>>> array="+oldObj.getClass().isArray());
+	    	if(parentOldObj!=null)
+	    	{
+	       		System.err.println(">>>> Node db parent "+parentOldObj.getClass().getCanonicalName());
+		       //System.err.println(">>>> Total "+parentOldObj.getName()+" ways:"+(parentOldObj.getWays()!=null?""+parentOldObj.getWays().length:"null!!"));
+		    }
+	   		if(parentNewObj!=null)
+	    	{
+	       		System.err.println(">>>> Node parent "+parentNewObj.getClass().getCanonicalName());
+	       		//System.err.println(">>>> Total "+parentNewObj.getName()+" ways:"+parentNewObj.getWays().length);
+	    	}
+        	return newObj;
+         </sourceCode>
+	  </conversion>
+   </ubmo>
+   <ubmo matchOldClassVersion="A" 
+            matchCurrentClassVersion="B" 
+            matchClassName="rhp.aof4oop.apps.openstreetmap.Area"
+            name="AreaBounds$A_to_B">
+	 <conversion applyDefault="true" outputClassName="rhp.aof4oop.apps.openstreetmap.Area">
+	   <sourceCode>
+	    	//System.err.println(">>>> Node "+oldObj.getClass().getCanonicalName()+" -> "+newObj.getClass().getCanonicalName());
+	    	//System.err.println(">>>> array="+oldObj.getClass().isArray());
+	    	//System.err.println(">>>> Old Object::Nodes="+(oldObj.getNodes()!=null?""+oldObj.getNodes().length:"NULL"));
+	    	//System.err.println(">>>> New Object::Nodes="+(newObj.getNodes()!=null?""+newObj.getNodes().length:"NULL"));
+	    
+	    	System.err.println(">>>> Convert A to B");
+	    
+	    	rhp.aof4oop.apps.openstreetmap.Coordinate[] bounds=new rhp.aof4oop.apps.openstreetmap.Coordinate[4];
+	    	bounds[0]=new rhp.aof4oop.apps.openstreetmap.Coordinate(oldObj.getMaxlat(),oldObj.getMinlon());
+        	bounds[1]=new rhp.aof4oop.apps.openstreetmap.Coordinate(oldObj.getMaxlat(),oldObj.getMaxlon());
+        	bounds[2]=new rhp.aof4oop.apps.openstreetmap.Coordinate(oldObj.getMinlat(),oldObj.getMaxlon());
+        	bounds[3]=new rhp.aof4oop.apps.openstreetmap.Coordinate(oldObj.getMinlat(),oldObj.getMinlon());
+        	newObj.setBounds(bounds);
+        	return newObj;
+        </sourceCode>
+	  </conversion>
+   </ubmo>
+   <ubmo matchOldClassVersion="B | C" 
+            matchCurrentClassVersion="A" 
+            matchClassName="rhp.aof4oop.apps.openstreetmap.Area"
+            name="AreaBounds$BorC_to_A">
+	 <conversion applyDefault="true" outputClassName="rhp.aof4oop.apps.openstreetmap.Area">
+	 	<sourceCode>
+	 	System.err.println(">>>> Convert B or C ("+oldObj.getClass().getCanonicalName()+") to A");
+	    System.err.println(">>>> Old Object::Nodes="+(oldObj.getNodes()!=null?""+oldObj.getNodes().length:"NULL"));
+	    System.err.println(">>>> New Object::Nodes="+(newObj.getNodes()!=null?""+newObj.getNodes().length:"NULL"));
+	    if(oldObj.getBounds()!=null)
+	    {
+	       System.out.println("XXXXXXXXXXXXXXXXXXXX area="+newObj.calcKey()+"   bounds="+oldObj.getBounds().length);
+	    
+	       newObj.setMaxlat((float)oldObj.getBounds()[0].getLat());
+	       newObj.setMinlat((float)oldObj.getBounds()[2].getLat());
+	       newObj.setMaxlon((float)oldObj.getBounds()[1].getLon());
+	       newObj.setMinlon((float)oldObj.getBounds()[3].getLon());
+	    }
+	    else
+	    {
+	       System.out.println("XXXXXXXXXXXXXXXXXXXX area="+newObj.calcKey()+"   bounds=NULL");
+	    }
+        return newObj;
+        </sourceCode>
+	  </conversion>
+   </ubmo>
+   <ubmo matchOldClassVersion="A" 
+            matchCurrentClassVersion="C" 
+            matchClassName="rhp.aof4oop.apps.openstreetmap.Area"
+            name="AreaBounds$A_to_C">
+	 <conversion applyDefault="true" outputClassName="rhp.aof4oop.apps.openstreetmap.Area">
+	   <sourceCode>
+	    //System.err.println(">>>> Node "+oldObj.getClass().getCanonicalName()+" -> "+newObj.getClass().getCanonicalName());
+	    //System.err.println(">>>> array="+oldObj.getClass().isArray());
+	    //System.err.println(">>>> Old Object::Nodes="+(oldObj.getNodes()!=null?""+oldObj.getNodes().length:"NULL"));
+	    //System.err.println(">>>> New Object::Nodes="+(newObj.getNodes()!=null?""+newObj.getNodes().length:"NULL"));
+	    System.err.println(">>>> Convert A to C");
+	    
+	    org.openstreetmap.gui.jmapviewer.Coordinate[] bounds=new org.openstreetmap.gui.jmapviewer.Coordinate[4];
+	    bounds[0]=new org.openstreetmap.gui.jmapviewer.Coordinate(oldObj.getMaxlat(),oldObj.getMinlon());
+        bounds[1]=new org.openstreetmap.gui.jmapviewer.Coordinate(oldObj.getMaxlat(),oldObj.getMaxlon());
+        bounds[2]=new org.openstreetmap.gui.jmapviewer.Coordinate(oldObj.getMinlat(),oldObj.getMaxlon());
+        bounds[3]=new org.openstreetmap.gui.jmapviewer.Coordinate(oldObj.getMinlat(),oldObj.getMinlon());
+        newObj.setBounds(bounds);
+        return newObj;
+        </sourceCode>
+	  </conversion>
+  </ubmo>	 
+  <ubmo matchOldClassVersion="B" 
+            matchCurrentClassVersion="C" 
+            matchClassName="rhp.aof4oop.apps.openstreetmap.Area"
+            name="AreaBounds$B_to_C">
+	 <conversion applyDefault="true" outputClassName="rhp.aof4oop.apps.openstreetmap.Area">
+	    <sourceCode>
+	    System.err.println(">>>> Convert B to C ("+oldObj.getName()+")");
+	    System.err.println(">>>> Node "+oldObj.getClass().getCanonicalName()+" -> "+newObj.getClass().getCanonicalName());
+	    System.err.println(">>>> array="+oldObj.getClass().isArray());
+	    System.err.println(">>>> Old Object::Nodes="+(oldObj.getNodes()!=null?""+oldObj.getNodes().length:"NULL"));
+	    System.err.println(">>>> New Object::Nodes="+(newObj.getNodes()!=null?""+newObj.getNodes().length:"NULL"));
+	    System.err.println(">>>> Old Object::Bounds="+(oldObj.getBounds()!=null?""+oldObj.getBounds().length:"NULL"));
+	    System.err.println(">>>> New Object::Bounds="+(newObj.getBounds()!=null?""+newObj.getBounds().length:"NULL"));
+	    
+	    org.openstreetmap.gui.jmapviewer.Coordinate[] bounds=new org.openstreetmap.gui.jmapviewer.Coordinate[oldObj.getBounds().length];
+	    int n=0;
+	    for(rhp.aof4oop.apps.openstreetmap.Coordinate c_old:oldObj.getBounds())
+	    {
+	    	bounds[n]=new org.openstreetmap.gui.jmapviewer.Coordinate(c_old.getLat(),c_old.getLon());
+	    	n++;
+	    }
+        newObj.setBounds(bounds);
+        return newObj;
+        </sourceCode>
+	  </conversion>
+   </ubmo>
+     <ubmo matchOldClassVersion="C" 
+            matchCurrentClassVersion="B" 
+            matchClassName="rhp.aof4oop.apps.openstreetmap.Area"
+            name="AreaBounds$C_to_B">
+	 <conversion applyDefault="true" outputClassName="rhp.aof4oop.apps.openstreetmap.Area">
+	    <sourceCode>
+	    System.err.println(">>>> Convert C to B");
+	    //System.err.println(">>>> Node "+oldObj.getClass().getCanonicalName()+" -> "+newObj.getClass().getCanonicalName());
+	    //System.err.println(">>>> array="+oldObj.getClass().isArray());
+	    //System.err.println(">>>> Old Object::Nodes="+(oldObj.getNodes()!=null?""+oldObj.getNodes().length:"NULL"));
+	    //System.err.println(">>>> New Object::Nodes="+(newObj.getNodes()!=null?""+newObj.getNodes().length:"NULL"));
+	    
+	    rhp.aof4oop.apps.openstreetmap.Coordinate[] bounds=new rhp.aof4oop.apps.openstreetmap.Coordinate[oldObj.getBounds().length];
+	    int n=0;
+	    for(org.openstreetmap.gui.jmapviewer.Coordinate c_old:oldObj.getBounds())
+	    {
+	    	bounds[n]=new rhp.aof4oop.apps.openstreetmap.Coordinate(c_old.getLat(),c_old.getLon());
+	    	n++;
+	    }
+        newObj.setBounds(bounds);
+        return newObj;
+        </sourceCode>
+	  </conversion>
+   </ubmo>
+   <ubmo matchOldClassVersion="S1" 
+	 	 matchCurrentClassVersion="S2 | S3 | S4" 
+         matchClassName="rhp.aof4oop.oo7.datamodel.AtomicPart"
+         name="ConvAtomicPart$S1_to_S2orS3orS4">
+	 <conversion applyDefault="true" outputClassName="rhp.aof4oop.oo7.datamodel.AtomicPart">
+	    <sourceCode>
+	    System.err.println(">>>> Convert (AtomicPart S1 -> S2|S3|S4)");
+	    //System.err.println(">>>> Convert (AtomicPart S1 -> S2|S3|S4) "+oldObj.getClass().getCanonicalName()+" -> "+newObj.getClass().getCanonicalName());
+	    newObj.setZ(oldObj.getX()+oldObj.getY());
+	    //System.err.println(">>>> Z="+newObj.getZ());
+        return newObj;
+        </sourceCode>
+	  </conversion>
+   </ubmo>
+      <ubmo matchOldClassVersion="S4" 
+	 	 matchCurrentClassVersion="S1" 
+         matchClassName="rhp.aof4oop.oo7.datamodel.AtomicPart"
+         name="ConvAtomicPart$S4_to_S1">
+	 <conversion applyDefault="true" outputClassName="rhp.aof4oop.oo7.datamodel.AtomicPart">
+	    <sourceCode>
+    	System.err.println(">>>> AtomicPart S4 -> S1!");
+	    newObj.setY(oldObj.getZ()+oldObj.getX());
+        return newObj;
+        </sourceCode>
+	  </conversion>
+   </ubmo>
+</AOF4OOP>

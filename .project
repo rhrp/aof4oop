@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>aof4oop</name>
-	<comment></comment>
+	<comment>Aspect-Oriented Framework for Object Orthogonal Persistence</comment>
 	<projects>
 	</projects>
 	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.wst.common.project.facet.core.builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.ajdt.core.ajbuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
+		<nature>org.eclipse.ajdt.ui.ajnature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.eclipse.wst.common.project.facet.core.nature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>dst</name>
+			<type>2</type>
+			<location>C:/home/rhp/workspace/preprocessor/work/dst</location>
+		</link>
+	</linkedResources>
 </projectDescription>

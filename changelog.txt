@@ -1,0 +1,72 @@
+Not urgent:
+TODO::008: The Aof4oopPersistent annotation does not work. Local variables cannot be advised in AspectJ.
+TODO::010: When updating a persistent root array the added (reachable) objects from its cells are not made persistent    
+TODO::020: How to find which are primitive type objects
+TODO::034: No processo de geração das classes renomeadas as propriedades e métodos não têm os seus atributos renomeados e coerentes com a versão do esquema
+TODO::035: Create new UBMO directives to optimize DB loading for object conversion 
+TODO::036: The cells of an array of objects, of type java.lang.Object, are not correctly saved.
+TODO::037:
+TODO: have a Container config file
+
+Urgent:
+TODO: The CClassLoader.exportAllClassVersions() method does not clean the filesystem directory
+TODO: O directorio definido por CDefinitions.AOF4OOP_DYN_WEAVER_OUTDIR deveria ser limpo no arranque da aplicação 
+
+
+****** APP DEMO **** : alteração do tipo de Staff, registo de novo Student/Staff e pesquisa
+
+ChangeLog
+2016-04-07 - [CHANGE]  Code cleanup and translation to English
+2016-03-16 - [BUGFIX]  During the user-defined conversion if a class was never used CL.getClass() never found that class. CL.loadClass() is now used.  
+2016-03-03 - [FEATURE] The root arrays do not require a cast.  
+2015-02-09 - [FEATURE] Rashid's case study demo app (CRUD functions and search)
+2014-12-10 - [FEATURE] New Ant Task and shell script that automates full oo7 benchmark 
+2014-12-03 - [FEATURE] OO7 robustness test application now records its data into a CSV file
+             [FEATURE] New statistics for updated objects
+2014-11-19 - [FEATURE] UBMO database validator
+2014-10-30 - [BUGFIX]  During adaptation the reading/writing updates in objects should not be reflected at database. Despite of it being not persistent, during this process, after it they are considered as persistent. Thus, those updates were wrongly put into database. Persistence for writing is disabled during adaptation.   
+2014-10-27 - [BUGFIX]  Minor corrections into TransactionLog mechanism
+2014-08-21 - [FEATURE] UNDO data structure and complex transaction support begin/commit/rollback transaction
+2014-05-20 - [BUGFIX]  Problems saving arrays of primitives and java.lang.Object
+2014-04-11 - [BUGFIX]  Problems saving arrays of primitives and java.lang.Object 
+2014-04-10 - [FEATURE] The DB  object loading to feed user-defined instance adaptation implements a fixed depth on object loading 
+2014-04-03 - [FEATURE] UBMO syntax supports "or" operator in class version matcher
+2014-03-28 - [CHANGE]  New UBMO syntax   
+2014-03-27 - [FEATURE] Geographical Application has a new version "C" of class Area
+             [BUGFIX]  Not equivalent fields were not converted 
+2014-03-26 - [FEATURE] Support for inner classes 
+2014-03-21 - [CHANGE]  Several performance enhancements  
+2014-03-19 - [CHANGE]  CRootObject renamed to CRootMetaObject, CObjectClassVersion renamed to CClassVersionMetaObject, CObjectInstance renamed to CInstanceMetaObject and CObjectLink renamed to CAttributeMetaObject
+             [CHANGE]  Several improvements on UBMO's matching process
+2013-10-11 - [FEATURE] The relations are part of the database
+2013-09-24 - [FEATURE] doConversion() now receives parentNewObject reference. 
+             [FEATURE] UBMO have two new match parameters: matchParentMember and matchParentClassName 
+2013-09-02 - [FEATURE] New features in DemoJMapViewer
+2013-08-28 - [FEATURE] New aspect for framework statistics
+             [FEATURE] News statistics
+             [OPTIMIZE] Eliminating double check on object state persistence
+2013-08-23 - [OPTIMIZE] The Cache now have a map of cached object by its identity. See: JDK-6321873  and JDK-6809470  
+2013-08-21 - [BUGFIX] The query execution does not search in the cache before load and adapt object. 
+2013-08-21 - [OPTIMIZE] CPersistentRoot.saveCacheEntry(long loid,Object object) now searches objects by its LOID, it is must more efficient.
+2013-08-20 - [OPTIMIZE] AObjectStorageDB4O.__getFieldArray() it was optimized. Now preloads all array og IMOs with findObjectInstance(long[] logicalObjectIds)
+2013-08-12 - [BUGFIX] CObjectClassVersion.directMapping() - The loaded class was obtained through getClass() now uses loadClass() that load if it is not in the cache
+2012-08-07 - Same enhancements on framework and DemoSequancial demo application 
+2012-08-06 - UBMO weaver was implemented
+2012-08-04 - UBMO Meta-objects were implemented
+2012-06-09 - Now Classes are also cached.
+             All debug code critical that affects performance was commented
+2012-05-25 - New CurrentClassVersion Cache Classloader (class version meta-objects)
+2012-05-23 - New ClassVersions Cache Classloader (class version meta-objects)
+2012-05-20 - Traverse test with Trav2
+2012-05-16 - Meta-object cache: CObjectInstance and CObjectLink 
+2012-05-15 - Object cache: Now the key to cache entries is the object LOID. Until now was the object reference converted to string. Apparently, that causes several problems due to unknown causes.
+2012-05-13 - 007 benchmark - L7C100 test ok with two issues.
+             New Object Map which records object point by object members. This is useful to save array references since array do not have a LOID that permit their place in object cache.  
+2012-05-12 - 007 benchmark - Correction on BA/CP links creation.
+2012-05-05 - oo7 benchmark - database creation and traverse Trav1 is available 
+2012-05-02 - oo7 benchmark - Data model definition
+             Data migration covers all fields in class lattice        
+2012-05-01 - Arrays are also treated inside a object tree. Recursively. 
+2012-04-30 - Start oo7 benchmark development 
+2012-04-15 - Arrays are now correctly treated
+2012-04-14 - Parametric classes have their parameters saved in IMO Meta-object and are available at run-time

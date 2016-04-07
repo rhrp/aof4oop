@@ -1,0 +1,23 @@
+Versão A
+
+Class Person com a propriedade name e SEM birth
+
+rhp.aof4oop.dataobjects.Family   version:fe9dfd810e1118aa1b4f8ff9335e3383
+rhp.aof4oop.dataobjects.Person   version:1a98ac01f799d02d2095835d1c111a1e
+rhp.aof4oop.dataobjects.Address   version:e3e5cc27b71eabe4a0879228e0c0d2d9
+
+-------------------------------------------------------------------------------------
+
+Versão B
+
+Class Person  com a propriedade name e COM birth
+rhp.aof4oop.dataobjects.Person   version:a2f06af7f6b55fd04b87fd0b8383e4f7
+
+-------------------------------------------------------------------------------------
+
+Versão C
+
+Class Person idem a B mas com a propriedade nome numa super class
+rhp.aof4oop.dataobjects.Person   version:cd08ffa53bca4b18055ea1d73b3a02e6
+
+
