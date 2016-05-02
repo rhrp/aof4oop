@@ -5,10 +5,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
-
-import com.sun.org.apache.xalan.internal.xsltc.runtime.Hashtable;
 
 import rhp.aof4oop.framework.core.CPersistentRoot;
 import rhp.aof4oop.framework.core.CQuery;

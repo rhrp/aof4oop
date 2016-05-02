@@ -37,6 +37,7 @@ public class CDynCompiler
 		super();
 		setClasspath(classpath);
 		this.outdir=outdir;
+		System.out.println("Init compiler with classpath "+getClasspath()+" in output dir "+getOutdir()+" ..");
 	}
 
 	//	public static void main(String args[]) throws Exception 
@@ -82,6 +83,11 @@ public class CDynCompiler
 	{
 
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+		if(compiler==null)
+		{
+			throw new NotFoundException("In this platform no compiler is provided");
+		}
+		System.out.println("Compiler: "+compiler.toString());
 		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
 
 		StandardJavaFileManager stdFileManager = compiler.getStandardFileManager(null, Locale.getDefault(), null);
@@ -101,23 +107,26 @@ public class CDynCompiler
 		{
 			for (Diagnostic<?> diagnostic : diagnostics.getDiagnostics()) 
 			{
-				System.out.println(diagnostic.getCode());
-				System.out.println(diagnostic.getKind());
-				System.out.println(diagnostic.getPosition());
-				System.out.println(diagnostic.getStartPosition());
-				System.out.println(diagnostic.getEndPosition());
-				System.out.println(diagnostic.getSource());
-				System.out.println(diagnostic.getMessage(null));
+				System.out.println("Code: "+diagnostic.getCode());
+				System.out.println("Kind: "+diagnostic.getKind());
+				System.out.println("Position: "+diagnostic.getPosition());
+				System.out.println("StartPosition: "+diagnostic.getStartPosition());
+				System.out.println("EndPosition: "+diagnostic.getEndPosition());
+				System.out.println("Source: "+diagnostic.getSource());
+				System.out.println("Message: "+diagnostic.getMessage(null));
 			}
 		}
 		System.out.println("Success: " + success);
-		//		ClassPool cp=ClassPool.getDefault();
-		//		ClassPath cc = cp.appendClassPath("tmp");
-		//		CtClass c = cp.getCtClass(classCanonicalName);
-		//		System.out.println("size="+c.toBytecode().length);
-		if(cl!=null)
+		if(success)
 		{
-			cl.register((getOutdir().endsWith("/")?getOutdir():getOutdir()+"/")+classCanonicalName.replace('.', '/')+".class",classCanonicalName,classCanonicalName);
+			//		ClassPool cp=ClassPool.getDefault();
+			//		ClassPath cc = cp.appendClassPath("tmp");
+			//		CtClass c = cp.getCtClass(classCanonicalName);
+			//		System.out.println("size="+c.toBytecode().length);
+			if(cl!=null)
+			{
+				cl.register((getOutdir().endsWith("/")?getOutdir():getOutdir()+"/")+classCanonicalName.replace('.', '/')+".class",classCanonicalName,classCanonicalName);
+			}
 		}
 		return success;
 	}

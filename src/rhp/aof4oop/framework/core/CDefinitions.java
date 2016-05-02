@@ -7,7 +7,7 @@ public class CDefinitions
 	// UBMO meta-objects repository
 	public static final String AOF4OOP_UBMODB					=	"ubmo.xml";
 	//Class path given to dynamic weaver
-	public static final String AOF4OOP_DYN_WEAVER_CLASSPATH		=	"dweaver/classpath:eclise/bin:dist/classes";// eclise/bin allows access to framework code as well as dist/classes when running by means of Ant 
+	public static final String AOF4OOP_DYN_WEAVER_CLASSPATH		=	"dweaver/classpath;eclipse/bin;dist/classes";// eclipse/bin allows access to framework code as well as dist/classes when running by means of Ant 
 	//Place where class loader exports all known class versions
 	public static final String AOF4OOP_CLASSLOADER_CLASSPATH	=	"dweaver/classpath";
 	//List of all Apps' JARs

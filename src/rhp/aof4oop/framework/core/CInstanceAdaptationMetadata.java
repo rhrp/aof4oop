@@ -166,12 +166,12 @@ public class CInstanceAdaptationMetadata
 			{
 				if(parentLink==null)
 				{
-System.out.println("parentLink is null");						
+					CDebugger.debug("parentLink is null");						
 					continue;
 				}
 				Object pobj=CPersistentRoot.findCachedObject(parentLink.getParentObjectId());
 				CClassVersionMetaObject tmp=cl.findApplicationObjectClassVersion(pobj.getClass().getCanonicalName());
-System.out.println("parentLink "+ubmo.getMatchParentClassVersion()+"("+ubmo.getMatchParentClassName()+") :: "+tmp.getClassVersion()+" ("+tmp.getClassCanonicalName()+")");					
+				CDebugger.debug("parentLink "+ubmo.getMatchParentClassVersion()+"("+ubmo.getMatchParentClassName()+") :: "+tmp.getClassVersion()+" ("+tmp.getClassCanonicalName()+")");					
 				if(!matchClassVersion(ubmo.getMatchParentClassVersion(),tmp.getClassVersion()))
 				{
 					continue;
@@ -181,10 +181,10 @@ System.out.println("parentLink "+ubmo.getMatchParentClassVersion()+"("+ubmo.getM
 			{
 				if(pcvmo==null)
 				{
-System.out.println("PCVMO is null");					
+					CDebugger.debug("PCVMO is null");					
 					continue;
 				}
-System.out.println("PCVMO "+ubmo.getMatchOldParentClassVersion()+"  :: "+pcvmo.getClassVersion());				
+				CDebugger.debug("PCVMO "+ubmo.getMatchOldParentClassVersion()+"  :: "+pcvmo.getClassVersion());				
 				if(!matchClassVersion(ubmo.getMatchOldParentClassVersion(),pcvmo.getClassVersion()))
 				{
 					continue;
@@ -213,7 +213,7 @@ System.out.println("PCVMO "+ubmo.getMatchOldParentClassVersion()+"  :: "+pcvmo.g
 		{
 			out=ubmo.equals(cvmo);
 		}
-		//System.out.println("Match ('"+ubmo+"','"+cvmo+"')="+out);
+		CDebugger.debug("Match ('"+ubmo+"','"+cvmo+"')="+out);
 		return out;
 	}
 	/**
@@ -241,7 +241,7 @@ System.out.println("PCVMO "+ubmo.getMatchOldParentClassVersion()+"  :: "+pcvmo.g
 				{
 					if(cvmo.equals(v.trim()))
 					{
-//						System.out.println("Match OR :: ubmo:"+ubmo+" ("+tmp.length+")   cvmo: "+cvmo+"   v="+v);
+						CDebugger.debug("Match OR :: ubmo:"+ubmo+" ("+tmp.length+")   cvmo: "+cvmo+"   v="+v);
 						return true;
 					}
 				}
@@ -290,7 +290,7 @@ System.out.println("PCVMO "+ubmo.getMatchOldParentClassVersion()+"  :: "+pcvmo.g
 	{
 		if(cl.getClass(genConversionClassName(oldClassVersion,ubmo))!=null)
 		{
-			//System.out.println("Class "+ubmo.getConversionClassName()+" already loaded");
+			CDebugger.debug("Conversion Class is already loaded");
 			return;
 		}
 		__weaveCode(cl,oldClassVersion,ubmo);
@@ -340,41 +340,19 @@ System.out.println("PCVMO "+ubmo.getMatchOldParentClassVersion()+"  :: "+pcvmo.g
 		code.append(  ubmo.getConversionSourceCode());
 		code.append("\n }");
 		code.append("\n}");
-		//System.out.println("Class "+ubmo.getConversionClassName()+" must be loaded");
-		//System.out.println("CODE:"+code.toString());
+		System.out.println("Class "+ubmo.toConversionClassName(oldClassVersion)+" must be loaded");
+		CDebugger.debug("CODE:"+code.toString());
 		
-		try 
-		{
-			boolean sucess=(new CDynCompiler(calcClasspath(CDefinitions.AOF4OOP_DYN_WEAVER_CLASSPATH,CDefinitions.AOF4OOP_APPCLASSPATH),CDefinitions.AOF4OOP_DYN_WEAVER_OUTDIR)).compile(genConversionClassName(oldClassVersion,ubmo), code.toString(),cl);
-			if(!sucess)
-			{
-				System.out.println("Error compiling Class "+ubmo.toConversionClassName(oldClassVersion));
-				System.out.println("CODE:\n--------------------------------------------\n"+code.toString()+"\n--------------------------------");
-				throw new EFrameworkFault("Error compiling Class "+ubmo.toConversionClassName(oldClassVersion));
-			}
-		} 
-		catch (IOException e) 
+
+		System.out.println("Start compiling process..");
+		boolean sucess=(new CDynCompiler(calcClasspath(CDefinitions.AOF4OOP_DYN_WEAVER_CLASSPATH,CDefinitions.AOF4OOP_APPCLASSPATH),CDefinitions.AOF4OOP_DYN_WEAVER_OUTDIR)).compile(genConversionClassName(oldClassVersion,ubmo), code.toString(),cl);
+		if(!sucess)
 		{
 			System.out.println("Error compiling Class "+ubmo.toConversionClassName(oldClassVersion));
 			System.out.println("CODE:\n--------------------------------------------\n"+code.toString()+"\n--------------------------------");
-			throw e;
-		} 
-		catch (NotFoundException e) 
-		{
-			System.out.println("Error compiling Class "+ubmo.toConversionClassName(oldClassVersion));
-			System.out.println("CODE:\n--------------------------------------------\n"+code.toString()+"\n--------------------------------");
-			throw e;
-		} 
-		catch (CannotCompileException e)
-		{
-			System.out.println("Error compiling Class "+ubmo.toConversionClassName(oldClassVersion));
-			System.out.println("CODE:\n--------------------------------------------\n"+code.toString()+"\n--------------------------------");
-			throw e;
+			throw new EFrameworkFault("Error compiling Class "+ubmo.toConversionClassName(oldClassVersion));
 		}
-		catch(Exception e)
-		{
-			throw new EFrameworkFault("Exception while compiling Class "+ubmo.toConversionClassName(oldClassVersion)+" ("+e.getMessage()+")");
-		}
+		System.out.println("Compiling ok");
 	}
 	/**
 	 * Execute the waved code
