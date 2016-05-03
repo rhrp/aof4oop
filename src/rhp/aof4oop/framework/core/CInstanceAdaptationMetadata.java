@@ -301,13 +301,21 @@ public class CInstanceAdaptationMetadata
 	 * @param p
 	 * @return
 	 */
-	private String calcClasspath(String p0,String[] p1)
+	private String calcClasspath(String[] p0,String[] p1)
 	{
+		String pathSeparatorChar = System.getProperty("path.separator");
 		String out="";
 		
-		if(p0!=null)
+		if(p0!=null && p0.length>0)
 		{
-			out+=p0;
+			for(String p:p0)
+			{
+				if(out.length()>0)
+				{
+					out+=pathSeparatorChar;
+				}
+				out+=p;
+			}
 		}
 		if(p1!=null && p1.length>0)
 		{
@@ -315,7 +323,7 @@ public class CInstanceAdaptationMetadata
 			{
 				if(out.length()>0)
 				{
-					out+=":";
+					out+=pathSeparatorChar;
 				}
 				out+=p;
 			}

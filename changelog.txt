@@ -16,6 +16,7 @@ TODO: O directorio definido por CDefinitions.AOF4OOP_DYN_WEAVER_OUTDIR deveria s
 ****** APP DEMO **** : alteração do tipo de Staff, registo de novo Student/Staff e pesquisa
 
 ChangeLog
+2016-05-03 - [CHANGE]  The classpath of the dweaver is now defined as an array of Strings
 2016-05-02 - [BUGFIX]  The classpath of the dweaver was not correctly defined in the Windows platform.
 2016-04-07 - [CHANGE]  Code cleanup and translation to English
 2016-03-16 - [BUGFIX]  During the user-defined conversion if a class was never used CL.getClass() never found that class. CL.loadClass() is now used.  
