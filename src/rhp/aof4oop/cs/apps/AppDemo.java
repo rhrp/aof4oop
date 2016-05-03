@@ -30,7 +30,7 @@ import rhp.aof4oop.framework.core.CPersistentRoot;
  * Along the source code the user can change between versions A and B.
  * Besides, the persistence mechanisms also can be changed between the ones provided by AOF4OOP and db4o
  * 
- * 
+ * Using Eclipse:
  * Don't forget to add the parameter
  * -Djava.system.class.loader=rhp.aof4oop.framework.core.CClassLoader		
  * 
@@ -39,6 +39,8 @@ import rhp.aof4oop.framework.core.CPersistentRoot;
  *	CClassLoader cl=new CClassLoader();
  *	Thread.currentThread().setContextClassLoader(cl);
  *
+ * Using Ant, run "srec" task:
+ * ant rsec
  */
 public class AppDemo extends JFrame implements ActionListener,ItemListener 
 {
@@ -693,7 +695,7 @@ public class AppDemo extends JFrame implements ActionListener,ItemListener
         
         //Size and display the window.
         Insets insets = frameApp.getInsets();
-        frameApp.setSize(650 + insets.left + insets.right,420 + insets.top + insets.bottom);
+        frameApp.setSize(710 + insets.left + insets.right,420 + insets.top + insets.bottom);
         frameApp.setVisible(true);
         
         
