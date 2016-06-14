@@ -35,7 +35,14 @@
   </path>
 
   <target name="clean">
+    <echo message="Deleting ${dist.dir}..." />
     <delete dir="${dist.dir}"/>
+    <echo message="Initing ${dweaver.dir}/out..." />
+    <delete dir="${dweaver.dir}/out"/>
+    <mkdir dir="${dweaver.dir}/out"/>
+    <echo message="Initing ${dweaver.dir}/classpath..." />
+    <delete dir="${dweaver.dir}/classpath"/>
+    <mkdir dir="${dweaver.dir}/classpath"/>
   </target>
 
   <!--
