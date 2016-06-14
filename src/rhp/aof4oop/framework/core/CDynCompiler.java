@@ -2,6 +2,7 @@ package rhp.aof4oop.framework.core;
 
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
@@ -21,6 +22,7 @@ import javax.tools.ToolProvider;
 import javax.tools.JavaCompiler.CompilationTask;
 
 import rhp.aof4oop.framework.core.CClassLoader;
+import rhp.aof4oop.framework.core.exceptions.EFrameworkFault;
 
 /**
  * This class provides all tools to dynamically compile and load in ClassLoader a class in source form
@@ -94,7 +96,10 @@ public class CDynCompiler
 		JavaFileObject file = new JavaSourceFromString(classCanonicalName, code);
 
 		System.out.println("Source: "+file.getName()+"  classCanonicalName:"+classCanonicalName);
-		System.out.println("Outdir: "+getOutdir()+"  classpaph: "+getClasspath());
+		System.out.println("Outdir: "+getOutdir()+"  classpath of class versions: "+getClasspath());
+		
+		checkDir("Outdir",getOutdir());
+		
 		String[] compileOptions;
 		compileOptions = new String[]{"-d",getOutdir(),"-classpath",getClasspath()} ;
 		Iterable<String> compilationOptions = Arrays.asList(compileOptions);
@@ -143,6 +148,33 @@ public class CDynCompiler
 	}
 	public void setOutdir(String outdir) {
 		this.outdir = outdir;
+	}
+	/**
+	 * Check if the out dir exists. If not, create the directory.
+	 */
+	private static void checkDir(String pName,String pDir)
+	{
+		File lOutDir=new File(pDir);
+		if(lOutDir.exists() && lOutDir.isDirectory())
+		{
+			System.out.println("The "+pName+" "+pDir+" exists");	
+		}
+		else if(lOutDir.exists() && !lOutDir.isDirectory())
+		{
+			throw new EFrameworkFault("The file "+pDir+" is not a directory");
+		}
+		else
+		{
+			boolean r=lOutDir.mkdir();
+			if(r)
+			{
+				System.out.println("The "+pName+" "+pDir+" was successfully created");	
+			}
+			else
+			{
+				throw new EFrameworkFault("Error while creating the the directory "+pDir);
+			}
+		}
 	}
 	class JavaSourceFromString extends SimpleJavaFileObject 
 	{
